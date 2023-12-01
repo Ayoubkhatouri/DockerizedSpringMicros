@@ -17,6 +17,7 @@ public interface CustomerRestClient {
     @CircuitBreaker(name = "customerService",fallbackMethod = "getDefaultAllCustomers")
     List<Customer> allCustomers();
 
+
     default Customer getDefaultCustomer(Long id,Exception exception){
         Customer customer=new Customer();
         customer.setId(id);
