@@ -36,6 +36,27 @@ services:
     environment:
       - DISCOVERY_SERVICE_URL=http://ebank-discovery-service:8761/eureka
       - CONFIG_SERVICE_URL=http://ebank-config-service:9999
+    healthcheck:
+      test: [ "CMD","curl","-f","http://localhost:9999/actuator/health" ]
+      interval: 10s
+      retries: 4
     depends_on:
      ebank-config-service:
        condition: service_healthy
+  ebank-account-service:
+    build: ./account-service
+    container_name: ebank-account-service
+    ports:
+      - '8082:8082'
+    expose:
+      - '8082'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://ebank-config-service:9999
+    healthcheck:
+      test: [ "CMD","curl","-f","http://localhost:8081/actuator/health" ]
+      interval: 10s
+      retries: 4
+    depends_on:
+      ebank-customer-service:
+        condition: service_healthy
