@@ -9,14 +9,33 @@ services:
     healthcheck:
       test: ["CMD","curl","-f","http://localhost:8761/actuator/health"]
       interval: 10s
-  ebank-config-srevice:
+      retries: 4
+  ebank-config-service:
     build: ./config-service
-    container_name: ebank-config-srevice
+    container_name: ebank-config-service
     ports:
       - '9999:9999'
     expose:
       - '9999'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ebank-discovery-service:8761/eureka
+    healthcheck:
+      test: [ "CMD","curl","-f","http://localhost:9999/actuator/health" ]
+      interval: 10s
+      retries: 4
     depends_on:
       ebank-discovery-service:
         condition: service_healthy
-
+  ebank-customer-service:
+    build: ./customer-service
+    container_name: ebank-customer-service
+    ports:
+      - '8081:8081'
+    expose:
+      - '8081'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://ebank-config-service:9999
+    depends_on:
+     ebank-config-service:
+       condition: service_healthy
