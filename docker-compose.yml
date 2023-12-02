@@ -56,3 +56,17 @@ services:
     depends_on:
       ebank-customer-service:
         condition: service_healthy
+  ebank-gateway-service:
+    build: ./gateway-service
+    container_name: ebank-gateway-service
+    ports:
+      - '8888:8888'
+    expose:
+      - '8888'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://ebank-config-service:9999
+    depends_on:
+      ebank-config-service:
+        condition: service_healthy
+
